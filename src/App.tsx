@@ -21,7 +21,10 @@ import {
   Eye,
   Code,
   BarChart2,
-  Menu
+  Menu,
+  ExternalLink,
+  Sun,
+  Moon
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -37,11 +40,11 @@ import {
 } from 'recharts';
 
 // ============================================================================
-// LOCKED DEVELOPER / CREATOR ATTRIBUTION
-// Change this single constant to your name before deploying to Vercel!
+// LOCKED DEVELOPER / CREATOR ATTRIBUTION & LINKEDIN PROFILE
 // ============================================================================
 
 const CREATOR_NAME = 'Debayan Ghosh';
+const CREATOR_LINKEDIN_URL = 'https://www.linkedin.com/in/dg-oozn/';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -139,7 +142,7 @@ class PreviewErrorBoundary extends React.Component<
           <div className="max-w-md w-full bg-white rounded-2xl border border-rose-200 shadow-lg p-6 space-y-4">
             <div className="flex items-center gap-3 text-rose-600">
               <AlertCircle className="w-6 h-6 shrink-0" />
-              <h2 className="text-base font-bold text-slate-900">QueryLens AI Recovery</h2>
+              <h2 className="text-base font-bold text-slate-900">SQL SamurAI Recovery</h2>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
               The interface encountered an unexpected issue:{' '}
@@ -148,7 +151,7 @@ class PreviewErrorBoundary extends React.Component<
             <button
               type="button"
               onClick={() => this.setState({ hasError: false, message: '' })}
-              className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-colors"
+              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
             >
               Reload Workspace
             </button>
@@ -496,7 +499,7 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
         columns: [],
         rows: [],
         executionTimeMs: 0,
-        error: 'Only SELECT queries are permitted in QueryLens AI.'
+        error: 'Only SELECT queries are permitted in SQL SamurAI.'
       };
     }
 
@@ -900,7 +903,7 @@ async function generateQueryFromNL(
   const schemaSummary = schema.map((c) => `${c.name} (${c.type})`).join(', ');
   const previewPayload = sampleRows.slice(0, 5);
 
-  const systemPrompt = `You are QueryLens AI, an executive analytics SQL engine.
+  const systemPrompt = `You are SQL SamurAI, an executive analytics SQL engine.
 Translate the user's natural-language question into a valid SQL SELECT query against table "${tableName}".
 Table metadata:
 - Total rows: ${totalRowCount}
@@ -1061,9 +1064,9 @@ function buildLocalDemoQuery(
       return {
         sql: `SELECT segment, SUM(attributed_revenue) AS total_revenue, SUM(deals_closed) AS total_deals FROM ${tableName} GROUP BY segment ORDER BY total_revenue DESC`,
         executiveSummary: [
-          'Enterprise leads all segments in attributed revenue, outperforming Mid-Market and SMB on deal value.',
-          'Mid-Market delivers strong deal velocity with balanced acquisition spend efficiency.',
-          'Prioritize Enterprise expansion playbooks while optimizing SMB conversion funnels.'
+          'Enterprise leads all segments in attributed revenue, outperforming Mid-Market and SMB.',
+          'Mid-Market delivers strong deal velocity with balanced acquisition spend.',
+          'Prioritize Enterprise expansion playbooks while optimizing SMB conversion.'
         ],
         chartType: 'bar',
         xKey: 'segment',
@@ -1074,8 +1077,8 @@ function buildLocalDemoQuery(
       return {
         sql: `SELECT region, SUM(attributed_revenue) AS total_revenue, SUM(ad_spend) AS total_spend, SUM(attributed_revenue) / SUM(ad_spend) AS roas FROM ${tableName} GROUP BY region ORDER BY roas DESC`,
         executiveSummary: [
-          'North America generates the highest absolute revenue volume across all active territories.',
-          'APAC and EMEA demonstrate competitive Return on Ad Spend (ROAS) efficiency per dollar invested.',
+          'North America generates the highest absolute revenue volume across regions.',
+          'APAC and EMEA show competitive Return on Ad Spend (ROAS) efficiency.',
           'Reallocate incremental paid media budget toward top-ROAS regional campaigns.'
         ],
         chartType: 'bar',
@@ -1087,9 +1090,9 @@ function buildLocalDemoQuery(
       return {
         sql: `SELECT quarter, SUM(attributed_revenue) AS quarterly_revenue, SUM(deals_closed) AS deals_closed FROM ${tableName} GROUP BY quarter ORDER BY quarter ASC`,
         executiveSummary: [
-          'Attributed revenue scales steadily from Q1 through Q4, confirming strong second-half momentum.',
+          'Attributed revenue scales steadily from Q1 through Q4 with strong H2 momentum.',
           'Q4 marks peak deal closure velocity as Enterprise procurement cycles finalize.',
-          'Front-load pipeline generation in Q1/Q2 to smooth seasonal revenue concentration.'
+          'Front-load pipeline generation in Q1/Q2 to smooth seasonal concentration.'
         ],
         chartType: 'line',
         xKey: 'quarter',
@@ -1100,9 +1103,9 @@ function buildLocalDemoQuery(
       return {
         sql: `SELECT account_name, segment, region, attributed_revenue, churn_risk_score FROM ${tableName} WHERE churn_risk_score >= 60 ORDER BY churn_risk_score DESC LIMIT 8`,
         executiveSummary: [
-          'Several high-revenue accounts exhibit churn risk scores above 60, representing material ARR exposure.',
-          'Elevated risk is concentrated among accounts with lower recent deal expansion velocity.',
-          'Assign executive customer success sponsors to top-ranked at-risk accounts immediately.'
+          'Several high-revenue accounts exhibit churn risk scores above 60.',
+          'Elevated risk is concentrated among accounts with slower recent deal velocity.',
+          'Assign executive customer success sponsors to top-ranked at-risk accounts.'
         ],
         chartType: 'bar',
         xKey: 'account_name',
@@ -1134,7 +1137,7 @@ function buildLocalDemoQuery(
       executiveSummary: [
         `Aggregated ${aggFn}(${matchedNumCol}) grouped across distinct ${matchedTextCol} categories.`,
         `Top-performing ${matchedTextCol} cohorts drive the majority of cumulative volume.`,
-        `Focus operational attention on leading ${matchedTextCol} segments while auditing underperformers.`
+        `Focus operational attention on leading ${matchedTextCol} segments.`
       ],
       chartType: isTrend ? 'line' : 'bar',
       xKey: matchedTextCol,
@@ -1161,7 +1164,7 @@ function buildLocalDemoQuery(
       sql: `SELECT COUNT(*) AS total_rows, SUM(${matchedNumCol}) AS total_${matchedNumCol}, AVG(${matchedNumCol}) AS avg_${matchedNumCol}, MAX(${matchedNumCol}) AS max_${matchedNumCol} FROM ${tableName}`,
       executiveSummary: [
         `Computed portfolio-wide summary statistics for ${matchedNumCol} across ${tableName}.`,
-        `Provides baseline total, mean, and peak bounds for executive benchmarking.`,
+        `Provides baseline total, mean, and peak bounds for quick benchmarking.`,
         `Segment by a categorical dimension to uncover variance drivers.`
       ],
       chartType: 'bar'
@@ -1183,7 +1186,22 @@ function buildLocalDemoQuery(
 // MAIN APPLICATION COMPONENT
 // ============================================================================
 
-function QueryLensWorkspace() {
+function SqlSamuraiWorkspace() {
+  // Theme State (Light / Dark Mode)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = safeSessionGet('sql_samurai_theme');
+    return saved === 'dark' ? 'dark' : 'light';
+  });
+  const isDark = theme === 'dark';
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      safeSessionSet('sql_samurai_theme', next);
+      return next;
+    });
+  };
+
   // Application Data State
   const [tableName, setTableName] = useState<string>('account_performance');
   const [dataset, setDataset] = useState<RowData[]>(() => INITIAL_DATASET);
@@ -1222,7 +1240,7 @@ function QueryLensWorkspace() {
   const [preferredYKey, setPreferredYKey] = useState<string | undefined>(undefined);
   const [liveAiError, setLiveAiError] = useState<string | null>(null);
 
-  // UI & Layout State (Schema sidebar collapsed on mobile < 768px, visible on desktop)
+  // UI & Layout State
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() =>
     typeof window !== 'undefined' ? window.innerWidth >= 768 : true
   );
@@ -1302,7 +1320,7 @@ function QueryLensWorkspace() {
           setLiveAiError(`Generated SQL failed execution: ${execResult.error}`);
           setTakeawayBullets([
             'The generated SQL query encountered an execution error against the current schema.',
-            'Inspect the SQL editor below or click "Reset to Demo Query" to restore a verified query.'
+            'Inspect the SQL editor or click "Reset to Demo Query" to restore a verified query.'
           ]);
         } else if (response.executiveSummary && response.executiveSummary.length > 0) {
           setTakeawayBullets(response.executiveSummary);
@@ -1586,9 +1604,9 @@ function QueryLensWorkspace() {
         : '- No executive summary available.';
 
     const markdownLines = [
-      `# QueryLens AI — Executive Analytics Brief`,
+      `# SQL SamurAI — Key Insights Brief`,
       ``,
-      `- **Created By:** ${CREATOR_NAME}`,
+      `- **Created By:** [${CREATOR_NAME}](${CREATOR_LINKEDIN_URL})`,
       `- **Dataset:** \`${tableName}\` (${dataset.length.toLocaleString()} rows)`,
       `- **Engine Mode:** ${modeLabel}`,
       `- **Generated:** ${timestamp}`,
@@ -1596,7 +1614,7 @@ function QueryLensWorkspace() {
       `## Analytical Question`,
       `> ${question}`,
       ``,
-      `## Executive Key Findings`,
+      `## Key Insights`,
       bulletsMarkdown,
       ``,
       `## Executed SQL Query`,
@@ -1616,12 +1634,12 @@ function QueryLensWorkspace() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${tableName}_executive_brief.md`);
+    link.setAttribute('download', `${tableName}_insights_brief.md`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    showToast('Downloaded Executive Brief (.md)');
+    showToast('Downloaded Insights Brief (.md)');
   };
 
   // Derive Chart Configuration safely: aggregates duplicates & caps high-cardinality categories
@@ -1741,58 +1759,90 @@ function QueryLensWorkspace() {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div
+      className={`min-h-screen w-full overflow-x-hidden flex flex-col font-sans transition-colors duration-200 ${
+        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      }`}
+    >
       {/* Top Application Header */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-slate-200 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      <header
+        className={`sticky top-0 z-30 border-b px-3 sm:px-6 py-3 flex items-center justify-between gap-2 shadow-xs transition-colors ${
+          isDark
+            ? 'bg-slate-900/95 border-slate-800 text-white backdrop-blur-xs'
+            : 'bg-white/95 border-slate-200 text-slate-900 backdrop-blur-xs'
+        }`}
+      >
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           {/* Schema Sidebar Toggle Button */}
           <button
             type="button"
             onClick={() => setIsSidebarOpen((prev) => !prev)}
             aria-label="Toggle Schema Explorer"
-            className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors flex items-center gap-1.5 shrink-0"
+            className={`p-2 rounded-xl border transition-colors shrink-0 ${
+              isDark
+                ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200'
+            }`}
           >
             <Menu className="w-4 h-4" />
-            <span className="hidden md:inline text-xs font-medium">Schema</span>
           </button>
 
-          {/* Brand Title & Locked Creator Badge */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
+          {/* Brand Title, Creator LinkedIn Link & Simple One-Liner */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <Database className="w-4 h-4" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-sm sm:text-lg font-bold tracking-tight text-slate-900 leading-none truncate">
-                  QueryLens AI
+                <h1 className="text-sm sm:text-lg font-bold tracking-tight leading-none truncate">
+                  SQL SamurAI
                 </h1>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] sm:text-[11px] font-semibold">
-                  Created by {CREATOR_NAME}
-                </span>
+                <a
+                  href={CREATOR_LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Connect with ${CREATOR_NAME} on LinkedIn`}
+                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-semibold transition-colors ${
+                    isDark
+                      ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30'
+                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                  }`}
+                >
+                  <span>By {CREATOR_NAME}</span>
+                  <ExternalLink className="w-2.5 h-2.5 opacity-85 shrink-0" />
+                </a>
               </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block mt-0.5">
-                Executive NL-to-SQL Analytics
+              <p
+                className={`text-[11px] hidden sm:block mt-0.5 ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}
+              >
+                Ask your data in plain English — no SQL required.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        {/* Right Action Controls: Mode Pill, Upload CSV, Dark/Light Theme Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Interactive Demo Mode / Live API Pill */}
           <button
             type="button"
             onClick={openAiSettingsModal}
             title="Configure Live AI Provider (Gemini / OpenAI) or Demo Mode"
-            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all ${
               liveAiConfig.enabled
-                ? 'bg-indigo-50 hover:bg-indigo-100 border-indigo-300 text-indigo-800'
+                ? isDark
+                  ? 'bg-sky-500/15 hover:bg-sky-500/25 border-sky-400/40 text-sky-300'
+                  : 'bg-sky-50 hover:bg-sky-100 border-sky-200 text-sky-700'
+                : isDark
+                ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-400/40 text-emerald-300'
                 : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700'
             }`}
           >
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
-                liveAiConfig.enabled ? 'bg-indigo-600 animate-pulse' : 'bg-emerald-500'
+                liveAiConfig.enabled ? 'bg-sky-500 animate-pulse' : 'bg-emerald-500'
               }`}
             />
             {liveAiConfig.enabled ? <span>Live API</span> : <span>Demo Mode</span>}
@@ -1810,7 +1860,7 @@ function QueryLensWorkspace() {
             type="button"
             disabled={isParsingCsv}
             onClick={() => fileInputRef.current?.click()}
-            className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-60 text-white text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all"
+            className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
           >
             {isParsingCsv ? (
               <>
@@ -1824,6 +1874,21 @@ function QueryLensWorkspace() {
               </>
             )}
           </button>
+
+          {/* Dark / Light Mode Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className={`p-2 rounded-xl border transition-colors ${
+              isDark
+                ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+            }`}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
       </header>
 
@@ -1833,25 +1898,43 @@ function QueryLensWorkspace() {
         {isSidebarOpen && (
           <div
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-slate-900/30 z-20 md:hidden"
+            className="fixed inset-0 bg-slate-950/40 z-20 md:hidden"
           />
         )}
 
         {/* Collapsible Schema Explorer Sidebar */}
         {isSidebarOpen && (
-          <aside className="fixed md:static inset-y-0 left-0 z-20 w-72 sm:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-lg md:shadow-none pt-14 md:pt-0">
+          <aside
+            className={`fixed md:static inset-y-0 left-0 z-20 w-72 sm:w-80 border-r flex flex-col shrink-0 shadow-lg md:shadow-none pt-14 md:pt-0 transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            }`}
+          >
             {/* Schema Explorer Header with Edit Headers Toggle */}
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between gap-2">
+            <div
+              className={`p-4 border-b flex items-center justify-between gap-2 ${
+                isDark ? 'border-slate-800' : 'border-slate-100'
+              }`}
+            >
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
-                  <Database className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                  <Database className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   <span>Schema Explorer</span>
                 </div>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="text-sm font-bold text-slate-800 font-mono truncate">
+                  <span
+                    className={`text-sm font-bold font-mono truncate ${
+                      isDark ? 'text-slate-100' : 'text-slate-800'
+                    }`}
+                  >
                     {tableName}
                   </span>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold shrink-0">
+                  <span
+                    className={`text-[11px] px-2 py-0.5 rounded-full font-semibold shrink-0 ${
+                      isDark
+                        ? 'bg-emerald-500/15 text-emerald-300'
+                        : 'bg-emerald-50 text-emerald-700'
+                    }`}
+                  >
                     {dataset.length.toLocaleString()} rows
                   </span>
                 </div>
@@ -1863,7 +1946,9 @@ function QueryLensWorkspace() {
                   onClick={handleToggleEditHeaders}
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border transition-colors ${
                     isEditingHeaders
-                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      ? 'bg-emerald-600 text-white border-emerald-600'
+                      : isDark
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
                       : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                   }`}
                 >
@@ -1873,7 +1958,7 @@ function QueryLensWorkspace() {
                 <button
                   type="button"
                   onClick={() => setIsSidebarOpen(false)}
-                  className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                  className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-200"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1882,14 +1967,14 @@ function QueryLensWorkspace() {
 
             {/* Inline Header Validation Error */}
             {isEditingHeaders && headerError && (
-              <div className="mx-3 mt-3 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-1.5">
+              <div className="mx-3 mt-3 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs flex items-start gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                 <span>{headerError}</span>
               </div>
             )}
 
-            {/* Column List */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
+            {/* Column List + Action Buttons Directly Underneath */}
+            <div className="p-3 space-y-1.5 overflow-y-auto">
               {schema.map((col) => {
                 const draftVal = headerDrafts[col.name] ?? col.name;
                 const sanitizedPreview = sanitizeColumnName(draftVal);
@@ -1899,8 +1984,12 @@ function QueryLensWorkspace() {
                     key={col.name}
                     className={`p-2.5 rounded-xl border transition-colors ${
                       isEditingHeaders
-                        ? 'bg-indigo-50/40 border-indigo-200'
-                        : 'bg-slate-50/80 hover:bg-indigo-50/50 border-slate-100 hover:border-indigo-100'
+                        ? isDark
+                          ? 'bg-emerald-950/30 border-emerald-700/40'
+                          : 'bg-emerald-50/40 border-emerald-200'
+                        : isDark
+                        ? 'bg-slate-800/60 hover:bg-slate-800 border-slate-800'
+                        : 'bg-slate-50/80 hover:bg-emerald-50/40 border-slate-100 hover:border-emerald-200'
                     }`}
                   >
                     {isEditingHeaders ? (
@@ -1917,7 +2006,11 @@ function QueryLensWorkspace() {
                               if (headerError) setHeaderError(null);
                             }}
                             placeholder="column_name"
-                            className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 bg-white text-xs font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                            className={`flex-1 min-w-0 px-2 py-1 rounded-lg border text-xs font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 ${
+                              isDark
+                                ? 'border-slate-700 bg-slate-900 text-slate-100'
+                                : 'border-slate-300 bg-white text-slate-800'
+                            }`}
                           />
                           <span
                             className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
@@ -1929,11 +2022,13 @@ function QueryLensWorkspace() {
                             {col.type}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono px-0.5">
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono px-0.5">
                           <span>SQL key:</span>
                           <span
                             className={
-                              sanitizedPreview ? 'text-indigo-700 font-semibold' : 'text-rose-600'
+                              sanitizedPreview
+                                ? 'text-emerald-500 font-semibold'
+                                : 'text-rose-500'
                             }
                           >
                             {sanitizedPreview || '(invalid)'}
@@ -1943,7 +2038,11 @@ function QueryLensWorkspace() {
                     ) : (
                       <>
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-mono font-semibold text-slate-800 truncate">
+                          <span
+                            className={`text-xs font-mono font-semibold truncate ${
+                              isDark ? 'text-slate-100' : 'text-slate-800'
+                            }`}
+                          >
                             {col.name}
                           </span>
                           <span
@@ -1957,58 +2056,69 @@ function QueryLensWorkspace() {
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-400 truncate mt-1">
-                          e.g. <span className="text-slate-600">{col.sample}</span>
+                          e.g.{' '}
+                          <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>
+                            {col.sample}
+                          </span>
                         </p>
                       </>
                     )}
                   </div>
                 );
               })}
-            </div>
 
-            {/* Edit Headers Action Bar or Quick Preview Footer */}
-            <div className="p-3.5 border-t border-slate-200 bg-slate-50/70 space-y-2">
-              {isEditingHeaders ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleApplyHeaderChanges}
-                    className="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Apply Changes</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleResetOriginalHeaders}
-                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Reset Original Headers</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  {hasRenamedHeaders && (
+              {/* Quick Preview Rows & Header Actions Placed Immediately Below Columns */}
+              <div className="pt-2.5 space-y-2">
+                {isEditingHeaders ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleApplyHeaderChanges}
+                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition-colors"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Apply Changes</span>
+                    </button>
                     <button
                       type="button"
                       onClick={handleResetOriginalHeaders}
-                      className="w-full py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      className={`w-full py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                        isDark
+                          ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                          : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                      }`}
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Reset Original Headers</span>
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setIsPreviewOpen(true)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 text-xs font-semibold flex items-center justify-center gap-2 shadow-2xs transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Quick Preview Rows</span>
-                  </button>
-                </>
-              )}
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewOpen(true)}
+                      className={`w-full py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 shadow-2xs transition-colors ${
+                        isDark
+                          ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30'
+                          : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                      }`}
+                    >
+                      <Eye className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Quick Preview Rows</span>
+                    </button>
+                    {hasRenamedHeaders && (
+                      <button
+                        type="button"
+                        onClick={handleResetOriginalHeaders}
+                        className="w-full py-2 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Reset Original Headers</span>
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </aside>
         )}
@@ -2017,21 +2127,25 @@ function QueryLensWorkspace() {
         <main className="flex-1 min-w-0 p-3 sm:p-6 max-w-7xl mx-auto w-full space-y-5">
           {/* CSV Ingestion Progress Banner */}
           {isParsingCsv && (
-            <div className="rounded-2xl bg-indigo-50 border border-indigo-200 px-4 py-3 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 text-indigo-800 text-xs font-semibold">
-                <span className="w-4 h-4 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin shrink-0" />
+            <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 text-emerald-500 text-xs font-semibold">
+                <span className="w-4 h-4 border-2 border-emerald-400/30 border-t-emerald-500 rounded-full animate-spin shrink-0" />
                 <span>
                   Streaming CSV in non-blocking batches... {csvParsedCount.toLocaleString()} rows processed
                 </span>
               </div>
-              <span className="text-[11px] font-mono bg-white px-2.5 py-0.5 rounded-full text-indigo-700 border border-indigo-200">
+              <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">
                 Chunked Loader
               </span>
             </div>
           )}
 
           {/* Natural-Language Question Bar & Sample Chips */}
-          <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3.5">
+          <section
+            className={`rounded-2xl border p-4 sm:p-5 shadow-xs space-y-3.5 transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+            }`}
+          >
             <form onSubmit={handleFormSubmit} className="relative">
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
@@ -2040,21 +2154,25 @@ function QueryLensWorkspace() {
                     type="text"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="Ask an analytical question in plain English..."
-                    className="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 bg-slate-50/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-sm text-slate-800 placeholder:text-slate-400 transition-all"
+                    placeholder="Ask a question about your data in plain English..."
+                    className={`w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-sm transition-all ${
+                      isDark
+                        ? 'border-slate-700 bg-slate-800/80 focus:bg-slate-800 text-slate-100 placeholder:text-slate-500'
+                        : 'border-slate-300 bg-slate-50/70 focus:bg-white text-slate-800 placeholder:text-slate-400'
+                    }`}
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isLoading || !question.trim()}
-                  className="px-5 py-2.5 sm:py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all shrink-0"
+                  className="px-5 py-2.5 sm:py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-all shrink-0"
                 >
                   {isLoading ? (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <Sparkles className="w-4 h-4" />
                   )}
-                  <span>{liveAiConfig.enabled ? 'Ask Live AI' : 'Ask QueryLens'}</span>
+                  <span>{liveAiConfig.enabled ? 'Ask Live AI' : 'Ask SQL SamurAI'}</span>
                 </button>
               </div>
             </form>
@@ -2073,7 +2191,11 @@ function QueryLensWorkspace() {
                     onClick={() => handleAskQuestion(chip)}
                     className={`text-xs px-3 py-1.5 rounded-full border transition-all text-left ${
                       isActive
-                        ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-semibold shadow-2xs'
+                        ? isDark
+                          ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-semibold'
+                          : 'bg-emerald-50 border-emerald-300 text-emerald-800 font-semibold shadow-2xs'
+                        : isDark
+                        ? 'bg-slate-800/70 hover:bg-slate-800 border-slate-700 text-slate-300'
                         : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                     }`}
                   >
@@ -2086,18 +2208,18 @@ function QueryLensWorkspace() {
 
           {/* Live AI Error Recovery Banner */}
           {liveAiError && (
-            <div className="rounded-2xl bg-rose-50 border border-rose-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-start gap-2.5 text-rose-800">
-                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div className="rounded-2xl bg-rose-500/10 border border-rose-500/30 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-start gap-2.5 text-rose-500">
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 <div className="text-xs sm:text-sm">
                   <p className="font-bold">Live AI Query Error</p>
-                  <p className="text-rose-700 mt-0.5 break-words">{liveAiError}</p>
+                  <p className="opacity-90 mt-0.5 break-words">{liveAiError}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleResetToDemoQuery}
-                className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs shrink-0 self-start sm:self-center transition-colors"
+                className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-2xs shrink-0 self-start sm:self-center transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset to Demo Query</span>
@@ -2105,142 +2227,185 @@ function QueryLensWorkspace() {
             </div>
           )}
 
-          {/* Executive Takeaway Card (Top of Results + Export Brief Button) */}
-          <section className="rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-900 text-white p-5 sm:p-6 shadow-md border border-indigo-500/30">
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center shrink-0 mt-0.5">
-                <TrendingUp className="w-5 h-5 text-indigo-100" />
-              </div>
-              <div className="flex-1 min-w-0 space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-100">
-                      Executive Takeaway
-                    </span>
-                    <span className="text-[11px] font-mono bg-white/15 px-2.5 py-0.5 rounded-full text-indigo-50">
-                      {sqlResult.executionTimeMs}ms • {sqlResult.rows.length.toLocaleString()} rows
-                    </span>
-                  </div>
+          {/* Split Row: Generated SQL Card + Compact Corner Key Insights Box */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+            {/* Toggleable Generated SQL Card (8 cols on desktop) */}
+            <section
+              className={`lg:col-span-8 rounded-2xl border overflow-hidden shadow-xs transition-colors ${
+                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              }`}
+            >
+              <div
+                className={`px-4 py-2.5 border-b flex items-center justify-between gap-2 ${
+                  isDark ? 'bg-slate-800/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsSqlOpen((prev) => !prev)}
+                  className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                    isDark
+                      ? 'text-slate-300 hover:text-emerald-400'
+                      : 'text-slate-700 hover:text-emerald-600'
+                  }`}
+                >
+                  <Code className="w-4 h-4 text-emerald-500" />
+                  <span>Generated SQL</span>
+                  <ChevronRight
+                    className={`w-4 h-4 text-slate-400 transition-transform ${
+                      isSqlOpen ? 'rotate-90' : ''
+                    }`}
+                  />
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopySql}
+                    className={`px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
+                      isDark
+                        ? 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200'
+                        : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {copiedSql ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        <span className="text-emerald-500">Copied</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
 
                   <button
                     type="button"
-                    onClick={handleExportBriefMarkdown}
-                    className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    onClick={handleRunEditedSql}
+                    className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
                   >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Export Brief</span>
+                    <Play className="w-3.5 h-3.5" />
+                    <span>Run SQL</span>
                   </button>
                 </div>
-
-                {takeawayBullets.length > 1 ? (
-                  <ul className="space-y-1.5 text-sm sm:text-[15px] leading-relaxed font-medium text-white/95">
-                    {takeawayBullets.map((bullet, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-indigo-200 font-bold select-none">•</span>
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm sm:text-base leading-relaxed font-medium text-white/95">
-                    {takeawayBullets[0] ||
-                      'Analyzing dataset metrics to surface executive insights...'}
-                  </p>
-                )}
               </div>
-            </div>
-          </section>
 
-          {/* Toggleable Generated SQL Card */}
-          <section className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-            <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => setIsSqlOpen((prev) => !prev)}
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-indigo-600 transition-colors"
-              >
-                <Code className="w-4 h-4 text-indigo-600" />
-                <span>Generated SQL</span>
-                <ChevronRight
-                  className={`w-4 h-4 text-slate-400 transition-transform ${
-                    isSqlOpen ? 'rotate-90' : ''
-                  }`}
-                />
-              </button>
+              {isSqlOpen && (
+                <div className="p-3.5 bg-slate-950">
+                  <textarea
+                    value={sqlText}
+                    onChange={(e) => setSqlText(e.target.value)}
+                    rows={3}
+                    spellCheck={false}
+                    aria-label="Editable SQL query"
+                    className="w-full bg-transparent text-emerald-300 font-mono text-xs sm:text-sm focus:outline-none resize-y leading-relaxed"
+                  />
+                </div>
+              )}
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleCopySql}
-                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors"
-                >
-                  {copiedSql ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-700">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
+              {sqlResult.error && (
+                <div className="p-3 bg-rose-500/10 border-t border-rose-500/30 text-rose-500 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{sqlResult.error}</span>
+                </div>
+              )}
+            </section>
 
-                <button
-                  type="button"
-                  onClick={handleRunEditedSql}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
-                >
-                  <Play className="w-3.5 h-3.5" />
-                  <span>Run SQL</span>
-                </button>
+            {/* Compact Non-Intrusive Corner Takeaway Box (4 cols on desktop) */}
+            <aside
+              className={`lg:col-span-4 rounded-2xl border p-3.5 shadow-xs space-y-2 transition-colors ${
+                isDark
+                  ? 'bg-slate-900 border-slate-800 text-slate-200'
+                  : 'bg-white border-slate-200 text-slate-700'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Quick Takeaway
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                      isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'
+                    }`}
+                  >
+                    {sqlResult.executionTimeMs}ms
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleExportBriefMarkdown}
+                    title="Export Markdown Brief"
+                    className={`px-2 py-0.5 rounded-md border text-[11px] font-semibold flex items-center gap-1 transition-colors ${
+                      isDark
+                        ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
+                    }`}
+                  >
+                    <FileText className="w-3 h-3 text-emerald-500" />
+                    <span>Brief</span>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {isSqlOpen && (
-              <div className="p-3.5 bg-slate-900">
-                <textarea
-                  value={sqlText}
-                  onChange={(e) => setSqlText(e.target.value)}
-                  rows={3}
-                  spellCheck={false}
-                  aria-label="Editable SQL query"
-                  className="w-full bg-transparent text-emerald-300 font-mono text-xs sm:text-sm focus:outline-none resize-y leading-relaxed"
-                />
-              </div>
-            )}
-
-            {sqlResult.error && (
-              <div className="p-3.5 bg-rose-50 border-t border-rose-200 text-rose-700 text-xs flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{sqlResult.error}</span>
-              </div>
-            )}
-          </section>
+              <ul className="space-y-1 text-xs leading-relaxed">
+                {(takeawayBullets.length > 0
+                  ? takeawayBullets.slice(0, 2)
+                  : ['Run any question to view concise data notes.']
+                ).map((bullet, idx) => (
+                  <li key={idx} className="flex items-start gap-1.5">
+                    <span className="text-emerald-500 font-bold select-none">•</span>
+                    <span className={isDark ? 'text-slate-300' : 'text-slate-600'}>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          </div>
 
           {/* Dynamic Recharts Visualization (Aggregated & High-Cardinality Protected) */}
           {chartConfig && !sqlResult.error && (
-            <section className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-4">
+            <section
+              className={`rounded-2xl border p-4 sm:p-5 shadow-xs space-y-4 transition-colors ${
+                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              }`}
+            >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-indigo-600" />
-                  <h2 className="text-sm font-bold text-slate-800">Visual Breakdown</h2>
+                  <BarChart2 className="w-4 h-4 text-emerald-500" />
+                  <h2
+                    className={`text-sm font-bold ${
+                      isDark ? 'text-slate-100' : 'text-slate-800'
+                    }`}
+                  >
+                    Visual Breakdown
+                  </h2>
                   {chartConfig.isCapped && (
-                    <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                    <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
                       Top 14 of {chartConfig.totalUniqueCategories.toLocaleString()} categories + Other
                     </span>
                   )}
                 </div>
 
                 {/* Chart Type Switcher */}
-                <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+                <div
+                  className={`inline-flex rounded-xl p-1 border ${
+                    isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'
+                  }`}
+                >
                   <button
                     type="button"
                     onClick={() => setChartType('bar')}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                       chartType === 'bar'
-                        ? 'bg-white text-indigo-600 shadow-2xs'
+                        ? isDark
+                          ? 'bg-slate-900 text-emerald-400 shadow-2xs'
+                          : 'bg-white text-emerald-600 shadow-2xs'
+                        : isDark
+                        ? 'text-slate-400 hover:text-white'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -2251,7 +2416,11 @@ function QueryLensWorkspace() {
                     onClick={() => setChartType('line')}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                       chartType === 'line'
-                        ? 'bg-white text-indigo-600 shadow-2xs'
+                        ? isDark
+                          ? 'bg-slate-900 text-emerald-400 shadow-2xs'
+                          : 'bg-white text-emerald-600 shadow-2xs'
+                        : isDark
+                        ? 'text-slate-400 hover:text-white'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -2264,14 +2433,14 @@ function QueryLensWorkspace() {
                 <ResponsiveContainer width="100%" height={300}>
                   {chartType === 'line' ? (
                     <LineChart data={chartConfig.data} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1e293b' : '#e2e8f0'} />
                       <XAxis
                         dataKey={chartConfig.xAxisKey}
-                        tick={{ fontSize: 11, fill: '#475569' }}
+                        tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#475569' }}
                         tickMargin={8}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fill: '#475569' }}
+                        tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#475569' }}
                         tickFormatter={(val) =>
                           typeof val === 'number'
                             ? val >= 1000
@@ -2283,7 +2452,9 @@ function QueryLensWorkspace() {
                       <Tooltip
                         contentStyle={{
                           borderRadius: '12px',
-                          borderColor: '#e2e8f0',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                          borderColor: isDark ? '#334155' : '#e2e8f0',
+                          color: isDark ? '#f8fafc' : '#0f172a',
                           fontSize: '12px'
                         }}
                       />
@@ -2293,7 +2464,7 @@ function QueryLensWorkspace() {
                           key={serie}
                           type="monotone"
                           dataKey={serie}
-                          stroke={idx === 0 ? '#4f46e5' : '#10b981'}
+                          stroke={idx === 0 ? '#10b981' : '#0ea5e9'}
                           strokeWidth={2.5}
                           dot={{ r: 4 }}
                           activeDot={{ r: 6 }}
@@ -2302,14 +2473,14 @@ function QueryLensWorkspace() {
                     </LineChart>
                   ) : (
                     <BarChart data={chartConfig.data} margin={{ top: 10, right: 20, left: 10, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1e293b' : '#e2e8f0'} />
                       <XAxis
                         dataKey={chartConfig.xAxisKey}
-                        tick={{ fontSize: 11, fill: '#475569' }}
+                        tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#475569' }}
                         tickMargin={8}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fill: '#475569' }}
+                        tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#475569' }}
                         tickFormatter={(val) =>
                           typeof val === 'number'
                             ? val >= 1000
@@ -2321,7 +2492,9 @@ function QueryLensWorkspace() {
                       <Tooltip
                         contentStyle={{
                           borderRadius: '12px',
-                          borderColor: '#e2e8f0',
+                          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                          borderColor: isDark ? '#334155' : '#e2e8f0',
+                          color: isDark ? '#f8fafc' : '#0f172a',
                           fontSize: '12px'
                         }}
                       />
@@ -2330,7 +2503,7 @@ function QueryLensWorkspace() {
                         <Bar
                           key={serie}
                           dataKey={serie}
-                          fill={idx === 0 ? '#4f46e5' : '#10b981'}
+                          fill={idx === 0 ? '#10b981' : '#0ea5e9'}
                           radius={[6, 6, 0, 0]}
                         />
                       ))}
@@ -2343,13 +2516,31 @@ function QueryLensWorkspace() {
 
           {/* Paginated Results Data Table + CSV Download */}
           {!sqlResult.error && (
-            <section className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <section
+              className={`rounded-2xl border overflow-hidden shadow-xs transition-colors ${
+                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              }`}
+            >
+              <div
+                className={`px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2 ${
+                  isDark ? 'bg-slate-800/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <h2
+                    className={`text-xs font-bold uppercase tracking-wider ${
+                      isDark ? 'text-slate-300' : 'text-slate-700'
+                    }`}
+                  >
                     Query Results
                   </h2>
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                      isDark
+                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    }`}
+                  >
                     {sqlResult.rows.length.toLocaleString()} total row{sqlResult.rows.length === 1 ? '' : 's'}
                   </span>
                 </div>
@@ -2359,9 +2550,13 @@ function QueryLensWorkspace() {
                     type="button"
                     disabled={sqlResult.rows.length === 0}
                     onClick={handleDownloadResultCsv}
-                    className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 disabled:opacity-50 text-slate-700 border border-slate-200 text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
+                    className={`px-3 py-1.5 rounded-lg border disabled:opacity-50 text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors ${
+                      isDark
+                        ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
                   >
-                    <Download className="w-3.5 h-3.5 text-indigo-600" />
+                    <Download className="w-3.5 h-3.5 text-emerald-500" />
                     <span>Download CSV</span>
                   </button>
                 </div>
@@ -2370,18 +2565,28 @@ function QueryLensWorkspace() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50/60">
+                    <tr
+                      className={`border-b ${
+                        isDark
+                          ? 'border-slate-800 bg-slate-800/40'
+                          : 'border-slate-200 bg-slate-50/60'
+                      }`}
+                    >
                       {sqlResult.columns.map((col) => (
                         <th
                           key={col}
-                          className="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap"
+                          className="py-2.5 px-4 text-[11px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap"
                         >
                           {col}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
+                  <tbody
+                    className={`divide-y text-xs sm:text-sm ${
+                      isDark ? 'divide-slate-800' : 'divide-slate-100'
+                    }`}
+                  >
                     {paginatedRows.length === 0 ? (
                       <tr>
                         <td
@@ -2395,7 +2600,11 @@ function QueryLensWorkspace() {
                       paginatedRows.map((row, rIdx) => (
                         <tr
                           key={rIdx}
-                          className="hover:bg-indigo-50/30 transition-colors"
+                          className={
+                            isDark
+                              ? 'hover:bg-slate-800/60 transition-colors'
+                              : 'hover:bg-emerald-50/40 transition-colors'
+                          }
                         >
                           {sqlResult.columns.map((col) => {
                             const val = row[col];
@@ -2405,9 +2614,13 @@ function QueryLensWorkspace() {
                                 key={col}
                                 className={`py-2.5 px-4 whitespace-nowrap ${
                                   isNum
-                                    ? 'font-mono text-slate-800 font-medium'
+                                    ? isDark
+                                      ? 'font-mono text-slate-100 font-medium'
+                                      : 'font-mono text-slate-800 font-medium'
                                     : val === null
                                     ? 'text-slate-400 italic'
+                                    : isDark
+                                    ? 'text-slate-300'
                                     : 'text-slate-700'
                                 }`}
                               >
@@ -2424,18 +2637,24 @@ function QueryLensWorkspace() {
 
               {/* Pagination Controls Footer (25 rows per page) */}
               {sqlResult.rows.length > 0 && (
-                <div className="px-4 py-3 bg-slate-50/70 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                <div
+                  className={`px-4 py-3 border-t flex flex-wrap items-center justify-between gap-2 text-xs ${
+                    isDark
+                      ? 'bg-slate-800/40 border-slate-800 text-slate-400'
+                      : 'bg-slate-50/70 border-slate-200 text-slate-600'
+                  }`}
+                >
                   <div>
                     Showing{' '}
-                    <span className="font-semibold text-slate-900">
+                    <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {((safeCurrentPage - 1) * PAGE_SIZE + 1).toLocaleString()}
                     </span>
                     –
-                    <span className="font-semibold text-slate-900">
+                    <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {Math.min(safeCurrentPage * PAGE_SIZE, sqlResult.rows.length).toLocaleString()}
                     </span>{' '}
                     of{' '}
-                    <span className="font-semibold text-slate-900">
+                    <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       {sqlResult.rows.length.toLocaleString()}
                     </span>{' '}
                     rows (25/page)
@@ -2446,13 +2665,21 @@ function QueryLensWorkspace() {
                       type="button"
                       disabled={safeCurrentPage <= 1}
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none font-semibold text-slate-700 flex items-center gap-1 transition-colors"
+                      className={`px-2.5 py-1.5 rounded-lg border disabled:opacity-40 disabled:pointer-events-none font-semibold flex items-center gap-1 transition-colors ${
+                        isDark
+                          ? 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200'
+                          : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700'
+                      }`}
                     >
                       <ChevronLeft className="w-3.5 h-3.5" />
                       <span>Prev</span>
                     </button>
 
-                    <span className="px-2.5 py-1 font-mono text-xs font-semibold text-slate-700">
+                    <span
+                      className={`px-2.5 py-1 font-mono text-xs font-semibold ${
+                        isDark ? 'text-slate-300' : 'text-slate-700'
+                      }`}
+                    >
                       Page {safeCurrentPage.toLocaleString()} of {totalPages.toLocaleString()}
                     </span>
 
@@ -2460,7 +2687,11 @@ function QueryLensWorkspace() {
                       type="button"
                       disabled={safeCurrentPage >= totalPages}
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none font-semibold text-slate-700 flex items-center gap-1 transition-colors"
+                      className={`px-2.5 py-1.5 rounded-lg border disabled:opacity-40 disabled:pointer-events-none font-semibold flex items-center gap-1 transition-colors ${
+                        isDark
+                          ? 'border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200'
+                          : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-700'
+                      }`}
                     >
                       <span>Next</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -2474,13 +2705,29 @@ function QueryLensWorkspace() {
       </div>
 
       {/* Persistent Locked Developer / Creator Footer Bar */}
-      <footer className="bg-white border-t border-slate-200 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+      <footer
+        className={`border-t px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-2 text-xs transition-colors ${
+          isDark
+            ? 'bg-slate-900 border-slate-800 text-slate-400'
+            : 'bg-white border-slate-200 text-slate-500'
+        }`}
+      >
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-slate-800">QueryLens AI</span>
+          <span className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            SQL SamurAI
+          </span>
           <span>•</span>
           <span>
             Developed &amp; Created by{' '}
-            <strong className="text-indigo-700 font-bold">{CREATOR_NAME}</strong>
+            <a
+              href={CREATOR_LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline font-bold transition-colors"
+            >
+              <span>{CREATOR_NAME}</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </span>
         </div>
         <span className="text-[11px] text-slate-400">
@@ -2491,26 +2738,32 @@ function QueryLensWorkspace() {
       {/* Quick Preview Rows Modal */}
       {isPreviewOpen && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4"
           onClick={() => setIsPreviewOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden"
+            className={`rounded-2xl border shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div
+              className={`px-5 py-4 border-b flex items-center justify-between ${
+                isDark ? 'bg-slate-800/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}
+            >
               <div>
-                <h3 className="text-sm font-bold text-slate-900">
-                  Quick Preview: <span className="font-mono text-indigo-600">{tableName}</span>
+                <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Quick Preview: <span className="font-mono text-emerald-500">{tableName}</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   Showing first 10 of {dataset.length.toLocaleString()} rows
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsPreviewOpen(false)}
-                className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors"
+                className="p-2 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2519,24 +2772,36 @@ function QueryLensWorkspace() {
             <div className="overflow-auto flex-1">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100/80 border-b border-slate-200 sticky top-0">
+                  <tr
+                    className={`border-b sticky top-0 ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700'
+                        : 'bg-slate-100/90 border-slate-200'
+                    }`}
+                  >
                     {schema.map((col) => (
                       <th
                         key={col.name}
-                        className="py-2.5 px-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-600 whitespace-nowrap"
+                        className="py-2.5 px-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap"
                       >
                         {col.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody
+                  className={`divide-y text-xs ${
+                    isDark ? 'divide-slate-800' : 'divide-slate-100'
+                  }`}
+                >
                   {dataset.slice(0, 10).map((row, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50">
+                    <tr key={idx} className={isDark ? 'hover:bg-slate-800/60' : 'hover:bg-slate-50'}>
                       {schema.map((col) => (
                         <td
                           key={col.name}
-                          className="py-2 px-3.5 whitespace-nowrap text-slate-700 font-mono"
+                          className={`py-2 px-3.5 whitespace-nowrap font-mono ${
+                            isDark ? 'text-slate-300' : 'text-slate-700'
+                          }`}
                         >
                           {formatCellDisplay(row[col.name])}
                         </td>
@@ -2553,21 +2818,29 @@ function QueryLensWorkspace() {
       {/* Live AI Mode Configuration Modal */}
       {isAiModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4"
           onClick={() => setIsAiModalOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden"
+            className={`rounded-2xl border shadow-2xl w-full max-w-md overflow-hidden ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div
+              className={`px-5 py-4 border-b flex items-center justify-between ${
+                isDark ? 'bg-slate-800/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}
+            >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-500 flex items-center justify-center">
                   <Key className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">AI Engine & API Settings</h3>
-                  <p className="text-xs text-slate-500">
+                  <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    AI Engine &amp; API Settings
+                  </h3>
+                  <p className="text-xs text-slate-400">
                     Switch between Demo Mode and Live LLM SQL generation
                   </p>
                 </div>
@@ -2575,7 +2848,7 @@ function QueryLensWorkspace() {
               <button
                 type="button"
                 onClick={() => setIsAiModalOpen(false)}
-                className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors"
+                className="p-2 rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2583,14 +2856,18 @@ function QueryLensWorkspace() {
 
             <form onSubmit={handleSaveAiSettings} className="p-5 space-y-4">
               {/* Live Mode Toggle Switch */}
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div
+                className={`flex items-center justify-between p-3.5 rounded-xl border ${
+                  isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
                 <div>
-                  <p className="text-xs font-bold text-slate-800">
+                  <p className={`text-xs font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>
                     {draftLiveEnabled ? 'Live AI Mode Enabled' : 'Demo Mode (Built-In Engine)'}
                   </p>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-slate-400">
                     {draftLiveEnabled
-                      ? 'Generates SQL & 3-bullet briefs via live LLM'
+                      ? 'Generates SQL & insights via live LLM'
                       : 'Works offline with zero external API calls'}
                   </p>
                 </div>
@@ -2603,11 +2880,11 @@ function QueryLensWorkspace() {
                     setModalError(null);
                   }}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
-                    draftLiveEnabled ? 'bg-indigo-600' : 'bg-slate-300'
+                    draftLiveEnabled ? 'bg-emerald-600' : 'bg-slate-400'
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-2xs transition duration-200 ease-in-out ${
                       draftLiveEnabled ? 'translate-x-5' : 'translate-x-0'
                     }`}
                   />
@@ -2616,7 +2893,7 @@ function QueryLensWorkspace() {
 
               {/* Provider Selector */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
                   LLM Provider
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -2625,7 +2902,9 @@ function QueryLensWorkspace() {
                     onClick={() => setDraftProvider('gemini')}
                     className={`py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                       draftProvider === 'gemini'
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-2xs'
+                        ? 'bg-emerald-500/15 border-emerald-500 text-emerald-500'
+                        : isDark
+                        ? 'bg-slate-800 border-slate-700 text-slate-300'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -2637,7 +2916,9 @@ function QueryLensWorkspace() {
                     onClick={() => setDraftProvider('openai')}
                     className={`py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                       draftProvider === 'openai'
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-2xs'
+                        ? 'bg-emerald-500/15 border-emerald-500 text-emerald-500'
+                        : isDark
+                        ? 'bg-slate-800 border-slate-700 text-slate-300'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -2649,7 +2930,7 @@ function QueryLensWorkspace() {
 
               {/* API Key Input */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
                   {draftProvider === 'gemini' ? 'Gemini API Key' : 'OpenAI API Key'}
                 </label>
                 <input
@@ -2660,35 +2941,47 @@ function QueryLensWorkspace() {
                     if (modalError) setModalError(null);
                   }}
                   placeholder={draftProvider === 'gemini' ? 'AIzaSy...' : 'sk-proj-...'}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 ${
+                    isDark
+                      ? 'border-slate-700 bg-slate-800 text-slate-100'
+                      : 'border-slate-300 bg-white text-slate-800'
+                  }`}
                 />
-                <div className="flex items-start gap-1.5 text-[11px] text-slate-500 pt-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-1.5 text-[11px] text-slate-400 pt-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                   <span>
-                    Saved in <code className="font-mono text-slate-700">sessionStorage</code> only.
-                    Only column metadata, row count, and 5 sample rows are ever sent—never your full CSV.
+                    Saved in <code className="font-mono">sessionStorage</code> only. Only column
+                    metadata, row count, and 5 sample rows are sent—never your full CSV.
                   </span>
                 </div>
               </div>
 
               {modalError && (
-                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-1.5">
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs flex items-start gap-1.5">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                   <span>{modalError}</span>
                 </div>
               )}
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+              <div
+                className={`pt-2 flex items-center justify-end gap-2 border-t ${
+                  isDark ? 'border-slate-800' : 'border-slate-100'
+                }`}
+              >
                 <button
                   type="button"
                   onClick={() => setIsAiModalOpen(false)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                  className={`px-3.5 py-2 rounded-xl border text-xs font-semibold transition-colors ${
+                    isDark
+                      ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-2xs transition-colors"
                 >
                   Save Settings
                 </button>
@@ -2711,7 +3004,7 @@ function QueryLensWorkspace() {
 export default function App() {
   return (
     <PreviewErrorBoundary>
-      <QueryLensWorkspace />
+      <SqlSamuraiWorkspace />
     </PreviewErrorBoundary>
   );
 }
