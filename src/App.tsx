@@ -37,6 +37,13 @@ import {
 } from 'recharts';
 
 // ============================================================================
+// LOCKED DEVELOPER / CREATOR ATTRIBUTION
+// Change this single constant to your name before deploying to Vercel!
+// ============================================================================
+
+const CREATOR_NAME = 'Debayan Ghosh';
+
+// ============================================================================
 // TYPES & INTERFACES
 // ============================================================================
 
@@ -135,7 +142,8 @@ class PreviewErrorBoundary extends React.Component<
               <h2 className="text-base font-bold text-slate-900">QueryLens AI Recovery</h2>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              The interface encountered an unexpected issue: <span className="font-mono text-rose-700">{this.state.message}</span>
+              The interface encountered an unexpected issue:{' '}
+              <span className="font-mono text-rose-700">{this.state.message}</span>
             </p>
             <button
               type="button"
@@ -210,9 +218,6 @@ const DEFAULT_SAMPLE_QUESTIONS = [
 
 // ============================================================================
 // ZERO-DEPENDENCY PURE TYPESCRIPT IN-BROWSER SQL ENGINE
-// Supports: SELECT, AS aliases, case-insensitive WHERE & IN filters,
-// GROUP BY (including aliases), SUM/AVG/COUNT/MIN/MAX (with or without GROUP BY),
-// arithmetic expressions, numeric/text ORDER BY (ASC/DESC), LIMIT, safe NULLs.
 // ============================================================================
 
 function splitTopLevelCommas(input: string): string[] {
@@ -247,7 +252,6 @@ function evaluateArithmeticExpression(expr: string, resolver: (token: string) =>
   const cleaned = expr.trim();
   if (!cleaned) return null;
 
-  // Tokenize numbers, identifiers/function calls, parentheses, and +, -, *, /
   const tokens: string[] = [];
   let i = 0;
   while (i < cleaned.length) {
@@ -261,8 +265,7 @@ function evaluateArithmeticExpression(expr: string, resolver: (token: string) =>
       i++;
       continue;
     }
-    // Read identifier (including function parentheses like SUM(col)) or numeric literal
-    let start = i;
+    const start = i;
     let parenDepth = 0;
     while (i < cleaned.length) {
       const c = cleaned[i];
@@ -354,10 +357,8 @@ function getCaseInsensitiveProp(row: RowData, colName: string): CellValue {
 function evaluateWhereClause(row: RowData, whereClause: string): boolean {
   if (!whereClause.trim()) return true;
 
-  // Split by OR at top level
   const orParts = whereClause.split(/\s+OR\s+/i);
   return orParts.some((orPart) => {
-    // Split by AND at top level
     const andParts = orPart.split(/\s+AND\s+/i);
     return andParts.every((cond) => evaluateSingleCondition(row, cond.trim()));
   });
@@ -367,7 +368,6 @@ function evaluateSingleCondition(row: RowData, cond: string): boolean {
   const cleaned = cond.replace(/^\(+|\)+$/g, '').trim();
   if (!cleaned) return true;
 
-  // IS NULL / IS NOT NULL
   const nullMatch = cleaned.match(/^([a-zA-Z0-9_]+)\s+IS\s+(NOT\s+)?NULL$/i);
   if (nullMatch) {
     const val = getCaseInsensitiveProp(row, nullMatch[1]);
@@ -375,7 +375,6 @@ function evaluateSingleCondition(row: RowData, cond: string): boolean {
     return nullMatch[2] ? !isNull : isNull;
   }
 
-  // NOT IN / IN
   const inMatch = cleaned.match(/^([a-zA-Z0-9_]+)\s+(NOT\s+)?IN\s*\((.+)\)$/i);
   if (inMatch) {
     const colVal = getCaseInsensitiveProp(row, inMatch[1]);
@@ -388,7 +387,6 @@ function evaluateSingleCondition(row: RowData, cond: string): boolean {
     return isNotIn ? !matched : matched;
   }
 
-  // LIKE
   const likeMatch = cleaned.match(/^([a-zA-Z0-9_]+)\s+(NOT\s+)?LIKE\s+['"](.*)['"]$/i);
   if (likeMatch) {
     const colVal = getCaseInsensitiveProp(row, likeMatch[1]);
@@ -402,7 +400,6 @@ function evaluateSingleCondition(row: RowData, cond: string): boolean {
     return isNotLike ? !matched : matched;
   }
 
-  // Comparison operators: >=, <=, !=, <>, =, >, <
   const opMatch = cleaned.match(/^([a-zA-Z0-9_]+)\s*(>=|<=|!=|<>|=|>|<)\s*(.+)$/);
   if (!opMatch) return true;
 
@@ -503,7 +500,6 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
       };
     }
 
-    // Parse major clauses: SELECT ... FROM ... [WHERE ...] [GROUP BY ...] [ORDER BY ...] [LIMIT ...]
     const clauseRegex =
       /^SELECT\s+(.+?)\s+FROM\s+([a-zA-Z0-9_]+)(?:\s+WHERE\s+(.+?))?(?:\s+GROUP\s+BY\s+(.+?))?(?:\s+ORDER\s+BY\s+(.+?))?(?:\s+LIMIT\s+(\d+))?$/i;
 
@@ -520,10 +516,8 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
 
     const [, selectClause, , whereClause = '', groupByClause = '', orderByClause = '', limitStr] = match;
 
-    // 1. Filter rows via WHERE
     const filteredRows = whereClause ? rows.filter((r) => evaluateWhereClause(r, whereClause)) : [...rows];
 
-    // 2. Parse SELECT items and aliases
     const rawSelectItems = splitTopLevelCommas(selectClause);
     interface SelectItem {
       expr: string;
@@ -551,7 +545,6 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
         expr = asMatch[1].trim();
         alias = asMatch[2].trim();
       } else {
-        // Auto-generate clean alias if expression is a function or arithmetic
         const cleanAuto = expr
           .replace(/\(\*\)/g, '_all')
           .replace(/[^a-zA-Z0-9_]+/g, '_')
@@ -569,7 +562,6 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
     const groupByCols = groupByClause
       ? splitTopLevelCommas(groupByClause).map((g) => {
           const gClean = g.trim();
-          // Support GROUP BY alias if alias maps to a non-aggregated source column
           const mappedExpr = aliasToExprMap[gClean.toLowerCase()];
           if (mappedExpr && !/\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/i.test(mappedExpr)) {
             return mappedExpr;
@@ -578,20 +570,16 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
         })
       : [];
 
-    // Helper to evaluate a select expression over a group of rows (or single row)
     const evaluateSelectExprForGroup = (expr: string, groupRows: RowData[]): CellValue => {
-      // Direct column lookup when not aggregated
       if (!/\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/i.test(expr) && /^[a-zA-Z0-9_]+$/.test(expr)) {
         return groupRows.length > 0 ? getCaseInsensitiveProp(groupRows[0], expr) : null;
       }
 
-      // Single aggregate function call e.g. SUM(attributed_revenue)
       const pureAggMatch = expr.match(/^(SUM|AVG|COUNT|MIN|MAX)\s*\((.+)\)$/i);
       if (pureAggMatch && !/[+\-*/]/.test(expr.replace(/^(SUM|AVG|COUNT|MIN|MAX)\s*\(|\)$/gi, ''))) {
         return computeAggregate(groupRows, pureAggMatch[1], pureAggMatch[2]);
       }
 
-      // Arithmetic expression containing aggregates or numeric columns
       return evaluateArithmeticExpression(expr, (token) => {
         const aggTokMatch = token.match(/^(SUM|AVG|COUNT|MIN|MAX)\s*\((.+)\)$/i);
         if (aggTokMatch) {
@@ -610,7 +598,6 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
     let outputRows: RowData[] = [];
 
     if (groupByCols.length > 0) {
-      // Group rows by composite key
       const groups = new Map<string, RowData[]>();
       for (const r of filteredRows) {
         const keyParts = groupByCols.map((col) => {
@@ -631,14 +618,12 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
         outputRows.push(outRow);
       }
     } else if (hasAnyAggregate) {
-      // Aggregate across entire filtered dataset (single summary row)
       const outRow: RowData = {};
       for (const item of selectItems) {
         outRow[item.alias] = evaluateSelectExprForGroup(item.expr, filteredRows);
       }
       outputRows.push(outRow);
     } else {
-      // Row-level projection
       for (const r of filteredRows) {
         const outRow: RowData = {};
         for (const item of selectItems) {
@@ -648,7 +633,6 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
       }
     }
 
-    // 3. ORDER BY (supports aliases, source columns, numeric & text sorting, ASC/DESC)
     if (orderByClause) {
       const orderSpecs = splitTopLevelCommas(orderByClause).map((part) => {
         const oMatch = part.trim().match(/^(.+?)(?:\s+(ASC|DESC))?$/i);
@@ -676,7 +660,6 @@ export function runSqlQuery(rows: RowData[], sql: string): SqlExecutionResult {
       });
     }
 
-    // 4. LIMIT
     if (limitStr) {
       const limitNum = parseInt(limitStr, 10);
       if (!Number.isNaN(limitNum) && limitNum >= 0) {
@@ -789,7 +772,7 @@ async function parseCsvTextAsync(
   const rawHeaders = parseCsvLine(lines[0]);
   const usedHeaders = new Set<string>();
   const sanitizedHeaders = rawHeaders.map((h, idx) => {
-    let base = sanitizeColumnName(h) || `column_${idx + 1}`;
+    const base = sanitizeColumnName(h) || `column_${idx + 1}`;
     let candidate = base;
     let suffix = 2;
     while (usedHeaders.has(candidate)) {
@@ -828,7 +811,6 @@ async function parseCsvTextAsync(
       onProgress(parsedRows.length);
     }
 
-    // Yield back to browser main thread between chunks so 10,000+ row CSVs never freeze UI
     if (end < lines.length) {
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
@@ -1263,14 +1245,7 @@ function QueryLensWorkspace() {
   const [headerDrafts, setHeaderDrafts] = useState<Record<string, string>>({});
   const [headerError, setHeaderError] = useState<string | null>(null);
 
- // Locked Developer / Creator Attribution
-  const CREATOR_NAME = 'Your Actual Name';  
-    const cleaned = creatorDraft.trim() || 'Debayan Ghosh';
-    setCreatorName(cleaned);
-    safeSessionSet('querylens_creator_name', cleaned);
-    setIsEditingCreator(false);
-    showToast(`Creator attribution updated to "${cleaned}"`);
-  };
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
@@ -1613,6 +1588,7 @@ function QueryLensWorkspace() {
     const markdownLines = [
       `# QueryLens AI — Executive Analytics Brief`,
       ``,
+      `- **Created By:** ${CREATOR_NAME}`,
       `- **Dataset:** \`${tableName}\` (${dataset.length.toLocaleString()} rows)`,
       `- **Engine Mode:** ${modeLabel}`,
       `- **Generated:** ${timestamp}`,
@@ -1780,7 +1756,7 @@ function QueryLensWorkspace() {
             <span className="hidden md:inline text-xs font-medium">Schema</span>
           </button>
 
-          {/* Brand Title & Persistent Creator Badge */}
+          {/* Brand Title & Locked Creator Badge */}
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <Database className="w-4 h-4" />
@@ -1790,7 +1766,7 @@ function QueryLensWorkspace() {
                 <h1 className="text-sm sm:text-lg font-bold tracking-tight text-slate-900 leading-none truncate">
                   QueryLens AI
                 </h1>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] sm:text-[11px] font-semibold">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] sm:text-[11px] font-semibold">
                   Created by {CREATOR_NAME}
                 </span>
               </div>
@@ -1819,11 +1795,7 @@ function QueryLensWorkspace() {
                 liveAiConfig.enabled ? 'bg-indigo-600 animate-pulse' : 'bg-emerald-500'
               }`}
             />
-            {liveAiConfig.enabled ? (
-              <span>Live API</span>
-            ) : (
-              <span>Demo Mode</span>
-            )}
+            {liveAiConfig.enabled ? <span>Live API</span> : <span>Demo Mode</span>}
           </button>
 
           {/* Upload CSV Button + Chunk Loading Indicator */}
@@ -1959,7 +1931,11 @@ function QueryLensWorkspace() {
                         </div>
                         <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono px-0.5">
                           <span>SQL key:</span>
-                          <span className={sanitizedPreview ? 'text-indigo-700 font-semibold' : 'text-rose-600'}>
+                          <span
+                            className={
+                              sanitizedPreview ? 'text-indigo-700 font-semibold' : 'text-rose-600'
+                            }
+                          >
                             {sanitizedPreview || '(invalid)'}
                           </span>
                         </div>
@@ -2497,7 +2473,7 @@ function QueryLensWorkspace() {
         </main>
       </div>
 
-      {/* Persistent Developer / Creator Footer Bar */}
+      {/* Persistent Locked Developer / Creator Footer Bar */}
       <footer className="bg-white border-t border-slate-200 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-slate-800">QueryLens AI</span>
@@ -2511,58 +2487,6 @@ function QueryLensWorkspace() {
           © {new Date().getFullYear()} {CREATOR_NAME}. All rights reserved.
         </span>
       </footer>
-
-            <div
-          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4"
-          onClick={() => setIsEditingCreator(false)}
-        >
-          <div
-            className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-sm overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <h3 className="text-sm font-bold text-slate-900">Set Developer / Creator Name</h3>
-              <button
-                type="button"
-                onClick={() => setIsEditingCreator(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <form onSubmit={handleSaveCreatorName} className="p-5 space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-                  Your Full Name
-                </label>
-                <input
-                  type="text"
-                  autoFocus
-                  value={creatorDraft}
-                  onChange={(e) => setCreatorDraft(e.target.value)}
-                  placeholder="Enter Debayan Ghosh..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
-                />
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsEditingCreator(false)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs"
-                >
-                  Save Name
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Quick Preview Rows Modal */}
       {isPreviewOpen && (
