@@ -1263,17 +1263,8 @@ function QueryLensWorkspace() {
   const [headerDrafts, setHeaderDrafts] = useState<Record<string, string>>({});
   const [headerError, setHeaderError] = useState<string | null>(null);
 
-  // Persistent Developer / Creator Attribution State
-  const [creatorName, setCreatorName] = useState<string>(
-    () => safeSessionGet('querylens_creator_name') || 'Debayan Ghosh'
-  );
-  const [isEditingCreator, setIsEditingCreator] = useState<boolean>(false);
-  const [creatorDraft, setCreatorDraft] = useState<string>('');
-
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleSaveCreatorName = (e: React.FormEvent) => {
-    e.preventDefault();
+ // Locked Developer / Creator Attribution
+  const CREATOR_NAME = 'Your Actual Name';  
     const cleaned = creatorDraft.trim() || 'Debayan Ghosh';
     setCreatorName(cleaned);
     safeSessionSet('querylens_creator_name', cleaned);
@@ -1799,18 +1790,9 @@ function QueryLensWorkspace() {
                 <h1 className="text-sm sm:text-lg font-bold tracking-tight text-slate-900 leading-none truncate">
                   QueryLens AI
                 </h1>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCreatorDraft(creatorName);
-                    setIsEditingCreator(true);
-                  }}
-                  title="Click to set your Developer / Creator name"
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 text-[10px] sm:text-[11px] font-semibold transition-colors"
-                >
-                  <span>Created by {creatorName}</span>
-                  <Edit3 className="w-2.5 h-2.5 opacity-70" />
-                </button>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] sm:text-[11px] font-semibold">
+                  Created by {CREATOR_NAME}
+                </span>
               </div>
               <p className="text-[11px] text-slate-500 hidden sm:block mt-0.5">
                 Executive NL-to-SQL Analytics
@@ -2522,24 +2504,15 @@ function QueryLensWorkspace() {
           <span>•</span>
           <span>
             Developed &amp; Created by{' '}
-            <strong className="text-indigo-700 font-bold">{creatorName}</strong>
+            <strong className="text-indigo-700 font-bold">{CREATOR_NAME}</strong>
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setCreatorDraft(creatorName);
-            setIsEditingCreator(true);
-          }}
-          className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 underline underline-offset-2"
-        >
-          Edit Developer Name
-        </button>
+        <span className="text-[11px] text-slate-400">
+          © {new Date().getFullYear()} {CREATOR_NAME}. All rights reserved.
+        </span>
       </footer>
 
-      {/* Developer / Creator Name Modal */}
-      {isEditingCreator && (
-        <div
+            <div
           className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4"
           onClick={() => setIsEditingCreator(false)}
         >
