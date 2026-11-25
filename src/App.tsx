@@ -1764,131 +1764,149 @@ function SqlSamuraiWorkspace() {
         isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* Top Application Header */}
+      {/* Top Application Header (Single-Row Clean Mobile + Desktop Layout) */}
       <header
-        className={`sticky top-0 z-30 border-b px-3 sm:px-6 py-3 flex items-center justify-between gap-2 shadow-xs transition-colors ${
+        className={`sticky top-0 z-30 border-b transition-colors ${
           isDark
             ? 'bg-slate-900/95 border-slate-800 text-white backdrop-blur-xs'
             : 'bg-white/95 border-slate-200 text-slate-900 backdrop-blur-xs'
         }`}
       >
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          {/* Schema Sidebar Toggle Button */}
-          <button
-            type="button"
-            onClick={() => setIsSidebarOpen((prev) => !prev)}
-            aria-label="Toggle Schema Explorer"
-            className={`p-2 rounded-xl border transition-colors shrink-0 ${
-              isDark
-                ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200'
-            }`}
-          >
-            <Menu className="w-4 h-4" />
-          </button>
+        <div className="px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
+          {/* Left: Sidebar Toggle, Brand Logo, Title & Desktop Creator Badge */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen((prev) => !prev)}
+              aria-label="Toggle Schema Explorer"
+              className={`p-2 rounded-xl border transition-colors shrink-0 ${
+                isDark
+                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200'
+              }`}
+            >
+              <Menu className="w-4 h-4" />
+            </button>
 
-          {/* Brand Title, Creator LinkedIn Link & Simple One-Liner */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
-              <Database className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-sm sm:text-lg font-bold tracking-tight leading-none truncate">
-                  SQL SamurAI
-                </h1>
-                <a
-                  href={CREATOR_LINKEDIN_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`Connect with ${CREATOR_NAME} on LinkedIn`}
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-semibold transition-colors ${
-                    isDark
-                      ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30'
-                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                <Database className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-sm sm:text-base font-bold tracking-tight whitespace-nowrap">
+                    SQL SamurAI
+                  </h1>
+                  <a
+                    href={CREATOR_LINKEDIN_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`Connect with ${CREATOR_NAME} on LinkedIn`}
+                    className={`hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-semibold whitespace-nowrap transition-colors ${
+                      isDark
+                        ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30'
+                        : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                    }`}
+                  >
+                    <span>By {CREATOR_NAME}</span>
+                    <ExternalLink className="w-2.5 h-2.5 opacity-85 shrink-0" />
+                  </a>
+                </div>
+                <p
+                  className={`text-[11px] hidden lg:block truncate ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
                   }`}
                 >
-                  <span>By {CREATOR_NAME}</span>
-                  <ExternalLink className="w-2.5 h-2.5 opacity-85 shrink-0" />
-                </a>
+                  Ask your data in plain English — no SQL required.
+                </p>
               </div>
-              <p
-                className={`text-[11px] hidden sm:block mt-0.5 ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
-                }`}
-              >
-                Ask your data in plain English — no SQL required.
-              </p>
             </div>
+          </div>
+
+          {/* Right: Mode Pill, Upload CSV, Dark/Light Theme Switcher */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={openAiSettingsModal}
+              title="Configure Live AI Provider (Gemini / OpenAI) or Demo Mode"
+              className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-[11px] sm:text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                liveAiConfig.enabled
+                  ? isDark
+                    ? 'bg-sky-500/15 hover:bg-sky-500/25 border-sky-400/40 text-sky-300'
+                    : 'bg-sky-50 hover:bg-sky-100 border-sky-200 text-sky-700'
+                  : isDark
+                  ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-400/40 text-emerald-300'
+                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700'
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full shrink-0 ${
+                  liveAiConfig.enabled ? 'bg-sky-500 animate-pulse' : 'bg-emerald-500'
+                }`}
+              />
+              <span>{liveAiConfig.enabled ? 'Live API' : 'Demo'}</span>
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              onChange={handleCsvUpload}
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={isParsingCsv}
+              onClick={() => fileInputRef.current?.click()}
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-[11px] sm:text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shadow-2xs transition-all"
+            >
+              {isParsingCsv ? (
+                <>
+                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>{csvParsedCount.toLocaleString()}...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5 shrink-0" />
+                  <span>Upload CSV</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className={`p-2 rounded-xl border transition-colors shrink-0 ${
+                isDark
+                  ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+              }`}
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
           </div>
         </div>
 
-        {/* Right Action Controls: Mode Pill, Upload CSV, Dark/Light Theme Toggle */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Interactive Demo Mode / Live API Pill */}
-          <button
-            type="button"
-            onClick={openAiSettingsModal}
-            title="Configure Live AI Provider (Gemini / OpenAI) or Demo Mode"
-            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              liveAiConfig.enabled
-                ? isDark
-                  ? 'bg-sky-500/15 hover:bg-sky-500/25 border-sky-400/40 text-sky-300'
-                  : 'bg-sky-50 hover:bg-sky-100 border-sky-200 text-sky-700'
-                : isDark
-                ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-400/40 text-emerald-300'
-                : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700'
-            }`}
+        {/* Clean Mobile Sub-Header Strip (Zero Overlap on Narrow Viewports) */}
+        <div
+          className={`md:hidden px-3 py-1.5 border-t flex items-center justify-between gap-2 text-[11px] ${
+            isDark
+              ? 'bg-slate-900/90 border-slate-800 text-slate-400'
+              : 'bg-slate-50/90 border-slate-200/80 text-slate-500'
+          }`}
+        >
+          <span className="truncate">Ask your data in plain English</span>
+          <a
+            href={CREATOR_LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold whitespace-nowrap shrink-0"
           >
-            <span
-              className={`w-2 h-2 rounded-full shrink-0 ${
-                liveAiConfig.enabled ? 'bg-sky-500 animate-pulse' : 'bg-emerald-500'
-              }`}
-            />
-            {liveAiConfig.enabled ? <span>Live API</span> : <span>Demo Mode</span>}
-          </button>
-
-          {/* Upload CSV Button + Chunk Loading Indicator */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv,text/csv"
-            onChange={handleCsvUpload}
-            className="hidden"
-          />
-          <button
-            type="button"
-            disabled={isParsingCsv}
-            onClick={() => fileInputRef.current?.click()}
-            className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
-          >
-            {isParsingCsv ? (
-              <>
-                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>{csvParsedCount.toLocaleString()}...</span>
-              </>
-            ) : (
-              <>
-                <Upload className="w-3.5 h-3.5" />
-                <span>Upload CSV</span>
-              </>
-            )}
-          </button>
-
-          {/* Dark / Light Mode Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className={`p-2 rounded-xl border transition-colors ${
-              isDark
-                ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-            }`}
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+            <span>By {CREATOR_NAME}</span>
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
         </div>
       </header>
 
@@ -1905,7 +1923,7 @@ function SqlSamuraiWorkspace() {
         {/* Collapsible Schema Explorer Sidebar */}
         {isSidebarOpen && (
           <aside
-            className={`fixed md:static inset-y-0 left-0 z-20 w-72 sm:w-80 border-r flex flex-col shrink-0 shadow-lg md:shadow-none pt-14 md:pt-0 transition-colors ${
+            className={`fixed md:static top-22 md:top-0 bottom-0 left-0 z-20 w-72 sm:w-80 border-r flex flex-col shrink-0 shadow-xl md:shadow-none transition-colors ${
               isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
             }`}
           >
@@ -1958,6 +1976,7 @@ function SqlSamuraiWorkspace() {
                 <button
                   type="button"
                   onClick={() => setIsSidebarOpen(false)}
+                  aria-label="Close Schema Explorer"
                   className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-200"
                 >
                   <X className="w-4 h-4" />
@@ -1974,7 +1993,7 @@ function SqlSamuraiWorkspace() {
             )}
 
             {/* Column List + Action Buttons Directly Underneath */}
-            <div className="p-3 space-y-1.5 overflow-y-auto">
+            <div className="p-3 space-y-1.5 overflow-y-auto flex-1">
               {schema.map((col) => {
                 const draftVal = headerDrafts[col.name] ?? col.name;
                 const sanitizedPreview = sanitizeColumnName(draftVal);
